@@ -8,6 +8,13 @@ const mongoose = require('mongoose')
 
 
 mongoose.connect(config.MONGODB_URI)
+  .then(() => {
+    info('connected to MongoDB')
+  })
+  .catch((error) => {
+    error('encountered error connecting to mongoDB, error.message')
+  })
+
 app.use(cors())
 app.use(express.json())
 
