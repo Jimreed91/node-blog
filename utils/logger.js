@@ -1,3 +1,5 @@
+// logging extracted to a module so logging to file
+// or service can be added easily
 const info = (...params) => {
   console.log(...params)
 }

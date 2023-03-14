@@ -11,10 +11,8 @@ const blogSchema = new mongoose.Schema({
   url: String,
   likes: Number
 })
-
-const Blog = mongoose.model('Blog', blogSchema)
-
 const mongoUrl = 'mongodb://localhost:27017'
+const Blog = mongoose.model('Blog', blogSchema)
 mongoose.connect(mongoUrl)
 
 app.use(cors())
@@ -37,8 +35,4 @@ app.post('/api/blogs', (request, response) => {
       response.status(201).json(result)
     })
 })
-
-const PORT = 3003
-app.listen(PORT, () => {
-  info(`Server running on port ${PORT}`)
-})
+module.exports = app
