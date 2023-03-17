@@ -33,7 +33,7 @@ describe('when blogs present in db', () => {
   });
 });
 
-describe('new blogs can be added to the db', () => {
+describe('valid blogs can be added to the db', () => {
   test('a valid blog is added to the db', async () => {
     const newBlog = {
       title: 'Whys Poignant Guide',
@@ -65,6 +65,29 @@ describe('new blogs can be added to the db', () => {
     // checking for likes: 0 in newly added blog
     const response = await api.get('/api/blogs');
     expect(response.body[2].likes).toBe(0);
+  });
+});
+
+describe('invalid blogs cannot be saved', () => {
+  test('blog with missing title cannot be created', async () => {
+    const newBlog = {
+      author: 'Cartoon Foxes',
+      url: 'https://why.com/',
+      likes: 7,
+    };
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(400);
+  });
+  test('blog with missing url cannot be created', async () => {
+    const newBlog = {
+      title: 'Something valid',
+      author: 'Cartoon Foxes',
+      likes: 7,
+    };
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(400);
   });
 });
 
