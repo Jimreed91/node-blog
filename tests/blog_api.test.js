@@ -33,6 +33,22 @@ describe('when blogs present in db', () => {
   });
 });
 
+describe('new blogs can be added to the db', () => {
+  test('a valid blog is added to the db', async () => {
+    const newBlog = {
+      title: 'Whys Poignant Guide',
+      author: 'Cartoon Foxes',
+      url: 'https://why.com/',
+      likes: 9,
+    };
+
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+  });
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
