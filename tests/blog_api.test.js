@@ -51,6 +51,21 @@ describe('new blogs can be added to the db', () => {
     const authors = (await response).body.map((blog) => blog.author);
     expect(authors).toContain(newBlog.author);
   });
+
+  test('a valid blog with no likes defaults to 0 likes', async () => {
+    const newBlog = {
+      title: 'Whys Poignant Guide',
+      author: 'Cartoon Foxes',
+      url: 'https://why.com/',
+    };
+    // expect blog to be added without likes defined
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201);
+    // checking for likes: 0 in newly added blog
+    const response = await api.get('/api/blogs');
+    expect(response.body[2].likes).toBe(0);
+  });
 });
 
 afterAll(async () => {
