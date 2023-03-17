@@ -4,9 +4,10 @@
   "description": "Simple blog recorder",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
     "lint": "eslint .",
-    "start": "nodemon index.js"
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "test": "NODE_ENV=test jest --verbose --runInBand"
   },
   "author": "James",
   "license": "ISC",
