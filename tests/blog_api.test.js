@@ -41,11 +41,15 @@ describe('new blogs can be added to the db', () => {
       url: 'https://why.com/',
       likes: 9,
     };
-
+    // testing for expected response
     await api.post('/api/blogs')
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
+    // testing for change to database
+    const response = api.get('/api/blogs');
+    const authors = (await response).body.map((blog) => blog.author);
+    expect(authors).toContain(newBlog.author);
   });
 });
 
