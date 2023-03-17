@@ -1,11 +1,15 @@
 // logging extracted to a module so logging to file
 // or service can be added easily
 const info = (...params) => {
-  console.log(...params);
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(...params);
+  }
 };
 
 const error = (...params) => {
-  console.error(...params);
+  if (process.env.NODE_ENV !== 'test') {
+    console.error(...params);
+  }
 };
 
 module.exports = {

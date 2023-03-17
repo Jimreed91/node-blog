@@ -23,7 +23,6 @@ describe('when blogs present in db', () => {
 
   test('all blogs are returned', async () => {
     const response = await api.get('/api/blogs');
-    console.log(response.body);
     expect(response.body).toHaveLength(initialBlogs.length);
   });
 

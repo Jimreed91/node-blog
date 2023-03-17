@@ -1,11 +1,13 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
 const config = require('./utils/config');
-const { info, error } = require('./utils/logger');
-
+const express = require('express');
 const app = express();
+const cors = require('cors');
+const { info, error } = require('./utils/logger');
+const mongoose = require('mongoose');
+require('express-async-errors');
+
 const blogsRouter = require('./controllers/blogs');
+const middleware = require('./utils/middleware');
 
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
@@ -18,6 +20,12 @@ mongoose.connect(config.MONGODB_URI)
 app.use(cors());
 app.use(express.json());
 
+if (!config.NODE_ENV === 'test') {
+  app.use(middleware.requestLogger);
+}
+
 app.use('/api/blogs', blogsRouter);
 
+app.use(middleware.unknownEndpoint);
+app.use(middleware.errorHandler);
 module.exports = app;
