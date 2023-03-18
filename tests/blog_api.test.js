@@ -106,6 +106,27 @@ describe('blogs can be deleted', () => {
   });
 });
 
+describe('blogs can be edited', () => {
+  test('with valid attributes a blog is updated', async () => {
+    const response = await api.get('/api/blogs');
+    const blogs = response.body;
+    const blogToUpdate = blogs[0];
+    const updatedBlog = {
+      title: blogs[0].title,
+      author: blogs[0].author,
+      url: blogs[0].author,
+      likes: 100,
+    };
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedBlog)
+      .expect(200);
+    const updated = await api.get('/api/blogs');
+    const returnedBlog = updated.body;
+    expect(returnedBlog[0].likes).toBe(100);
+  });
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
