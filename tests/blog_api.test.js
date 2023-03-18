@@ -90,6 +90,22 @@ describe('invalid blogs cannot be saved', () => {
   });
 });
 
+describe('blogs can be deleted', () => {
+  test('returns status 204 if valid', async () => {
+    const response = await api.get('/api/blogs');
+    const blogs = response.body;
+    const blogToDelete = blogs[0];
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204);
+    const remainingBlogs = await api.get('/api/blogs');
+    expect(remainingBlogs.body).toHaveLength(
+      blogs.length - 1,
+    );
+  });
+});
+
 afterAll(async () => {
   await mongoose.connection.close();
 });
