@@ -1,5 +1,5 @@
 const listHelper = require('../utils/list_helper');
-const { blogs } = require('./testBlogs');
+const helper = require('./blogTestHelper');
 
 describe('total likes', () => {
   const listWithOneBlog = [
@@ -20,7 +20,7 @@ describe('total likes', () => {
 
 describe('favourite likes', () => {
   test('returns one of the blogs with the most likes', () => {
-    const result = listHelper.favouriteLikes(blogs);
+    const result = listHelper.favouriteLikes(helper.blogs);
     expect(result).toEqual(
       {
         title: 'Canonical string reduction',
@@ -33,7 +33,7 @@ describe('favourite likes', () => {
 
 describe('most blogs', () => {
   test('returns the author with the most blogs', () => {
-    const result = listHelper.mostBlogs(blogs);
+    const result = listHelper.mostBlogs(helper.blogs);
     expect(result).toEqual(
       {
         author: 'Robert C. Martin',
@@ -45,7 +45,7 @@ describe('most blogs', () => {
 
 describe('most likes', () => {
   test('returns the author with the most likes', () => {
-    const result = listHelper.mostLikes(blogs);
+    const result = listHelper.mostLikes(helper.blogs);
     expect(result).toEqual(
       {
         author: 'Edsger W. Dijkstra',

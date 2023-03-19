@@ -3,14 +3,14 @@ const supertest = require('supertest');
 const app = require('../app');
 const api = supertest(app);
 const Blog = require('../models/blog');
-const testBlogs = require('./testBlogs');
-const initialBlogs = [testBlogs[0], testBlogs[1]];
+const helper = require('./blogTestHelper');
+const initialBlogs = [helper.blogs[0], helper.blogs[1]];
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObject = new Blog(testBlogs.blogs[0]);
+  let blogObject = new Blog(helper.blogs[0]);
   await blogObject.save();
-  blogObject = new Blog(testBlogs.blogs[1]);
+  blogObject = new Blog(helper.blogs[1]);
   await blogObject.save();
 });
 
