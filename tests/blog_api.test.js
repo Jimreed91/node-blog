@@ -4,14 +4,15 @@ const app = require('../app');
 const api = supertest(app);
 const Blog = require('../models/blog');
 const helper = require('./blogTestHelper');
+
 const initialBlogs = [helper.blogs[0], helper.blogs[1]];
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObject = new Blog(helper.blogs[0]);
-  await blogObject.save();
-  blogObject = new Blog(helper.blogs[1]);
-  await blogObject.save();
+  let blogObj = new Blog(initialBlogs[0]);
+  await blogObj.save();
+  blogObj = new Blog(initialBlogs[1]);
+  await blogObj.save();
 });
 
 describe('when blogs present in db', () => {
@@ -46,8 +47,8 @@ describe('valid blogs can be added to the db', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/);
     // testing for change to database
-    const response = api.get('/api/blogs');
-    const authors = (await response).body.map((blog) => blog.author);
+    const blogsAfter = await helper.blogsInDb();
+    const authors = (blogsAfter).map((blog) => blog.author);
     expect(authors).toContain(newBlog.author);
   });
 
@@ -62,8 +63,8 @@ describe('valid blogs can be added to the db', () => {
       .send(newBlog)
       .expect(201);
     // checking for likes: 0 in newly added blog
-    const response = await api.get('/api/blogs');
-    expect(response.body[2].likes).toBe(0);
+    const blogsAfter = await helper.blogsInDb();
+    expect(blogsAfter[2].likes).toBe(0);
   });
 });
 
@@ -92,38 +93,38 @@ describe('invalid blogs cannot be saved', () => {
 
 describe('blogs can be deleted', () => {
   test('returns status 204 if valid', async () => {
-    const response = await api.get('/api/blogs');
-    const blogs = response.body;
-    const blogToDelete = blogs[0];
+    const blogsBefore = await helper.blogsInDb();
+    const blogToDelete = blogsBefore[0];
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
       .expect(204);
-    const remainingBlogs = await api.get('/api/blogs');
-    expect(remainingBlogs.body).toHaveLength(
-      blogs.length - 1,
-    );
+
+    const remainingBlogs = await helper.blogsInDb();
+    expect(remainingBlogs).toHaveLength(blogsBefore.length - 1);
   });
 });
 
 describe('blogs can be edited', () => {
   test('with valid attributes a blog is updated', async () => {
-    const response = await api.get('/api/blogs');
-    const blogs = response.body;
-    const blogToUpdate = blogs[0];
-    const updatedBlog = {
-      title: blogs[0].title,
-      author: blogs[0].author,
-      url: blogs[0].author,
+    const blogsBefore = await helper.blogsInDb();
+    const blogToUpdate = blogsBefore[0];
+
+    const amendedBlog = {
+      title: blogToUpdate.title,
+      author: blogToUpdate.author,
+      url: blogToUpdate.author,
       likes: 100,
     };
+
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
-      .send(updatedBlog)
+      .send(amendedBlog)
       .expect(200);
-    const updated = await api.get('/api/blogs');
-    const returnedBlog = updated.body;
-    expect(returnedBlog[0].likes).toBe(100);
+
+    const blogsAfter = await helper.blogsInDb();
+    const updatedBlog = blogsAfter[0];
+    expect(updatedBlog.likes).toBe(100);
   });
 });
 
