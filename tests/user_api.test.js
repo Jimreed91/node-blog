@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
+const bcrypt = require('bcrypt');
 const app = require('../app');
 const api = supertest(app);
-const bcrypt = require('bcrypt');
+
 const User = require('../models/user');
 const helper = require('./user_test_helper');
 
-describe('when there is an initial user in the db', () => {
+describe('when there are initial users in the db', () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
-    const passwordHash = await bcrypt.hash('secret', 10);
-    const user = new User({ username: 'test', passwordHash });
+    let passwordHash = await bcrypt.hash('secret', 10);
+    let user = new User({ username: 'test', passwordHash });
+    passwordHash = await bcrypt.hash('secret', 10);
+    user = new User({ username: 'test1', passwordHash });
 
     await user.save();
   });
@@ -35,4 +38,30 @@ describe('when there is an initial user in the db', () => {
     const userNames = usersAfter.map((user) => user.name);
     expect(userNames).toContain(newUser.name);
   });
+
+  test('create fails if username invalid, returning 400', async () => {
+    // no username
+    const invalidUsername = {
+      name: 'Rin',
+      password: 'dogpassword',
+    };
+    await api.post('/api/users')
+      .send(invalidUsername)
+      .expect(400);
+    // username less than 3 chars
+    invalidUsername.username = 'Ch';
+    await api.post('/api/users')
+      .send(invalidUsername)
+      .expect(400);
+  });
+
+  test('GET users returns a list of users in json', async () => {
+    await api.get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+  });
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
 });

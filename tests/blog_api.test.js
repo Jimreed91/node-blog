@@ -13,7 +13,7 @@ beforeEach(async () => {
   await blogObj.save();
   blogObj = new Blog(initialBlogs[1]);
   await blogObj.save();
-});
+}, 100000);
 
 describe('when blogs present in db', () => {
   test('blogs are returned in json', async () => {
