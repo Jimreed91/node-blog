@@ -55,6 +55,17 @@ describe('when there are initial users in the db', () => {
       .expect(400);
   });
 
+  test('create fails if username is not unique, returning 400', async () => {
+    const passwordHash = await bcrypt.hash('secret', 10);
+    const users = await helper.usersInDb();
+    const duplicateUser = new User({ username: 'test1', passwordHash });
+    expect(users[0].username).toBe(duplicateUser.username);
+
+    await api.post('/api/users')
+      .send(duplicateUser)
+      .expect(400);
+  });
+
   test('GET users returns a list of users in json', async () => {
     await api.get('/api/users')
       .expect(200)
