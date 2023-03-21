@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const bcrypt = require('bcrypt');
 const app = require('../app');
+
 const api = supertest(app);
 
 const User = require('../models/user');
@@ -65,7 +66,7 @@ describe('when there are initial users in the db', () => {
 
     await api.post('/api/users')
       .send(duplicateUser)
-      .expect(500); // should be 400 and is in dev environment some middleware issue ???
+      .expect(400);
   });
 
   test('create fails if password is not present or too short', async () => {

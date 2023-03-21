@@ -1,9 +1,11 @@
 const config = require('./utils/config');
 const express = require('express');
+
 const app = express();
 const cors = require('cors');
-const { info, error } = require('./utils/logger');
 const mongoose = require('mongoose');
+const { info, error } = require('./utils/logger');
+
 mongoose.set('strictQuery', false);
 require('express-async-errors');
 

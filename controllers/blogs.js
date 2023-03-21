@@ -17,7 +17,7 @@ blogsRouter.post('/', async (request, response) => {
 });
 
 blogsRouter.put('/:id', async (req, res) => {
-  const body = req.body;
+  const { body } = req;
   const blog = {
     title: body.title,
     author: body.author,
