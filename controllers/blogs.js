@@ -5,14 +5,6 @@ const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
-const getTokenFrom = request => {
-  const authorization = request.get('authorization');
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '');
-  }
-  return null;
-};
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
     .find({}).populate('user', { username: 1, name: 1, id: 1 });
@@ -21,7 +13,9 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const blog = await new Blog(request.body);
-  const user = await User.findById(request.body.userId);
+  // verifying auth
+  console.log(request)
+  const user = await User.findById(request.token.id);
   blog.user = user.id;
 
   const newBlog = await blog.save();
