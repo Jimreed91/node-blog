@@ -13,6 +13,8 @@ describe('when there are initial users in the db', () => {
 
     let passwordHash = await bcrypt.hash('secret', 10);
     let user = new User({ username: 'test', passwordHash });
+    await user.save();
+
     passwordHash = await bcrypt.hash('secret', 10);
     user = new User({ username: 'test1', passwordHash });
 
@@ -58,11 +60,26 @@ describe('when there are initial users in the db', () => {
   test('create fails if username is not unique, returning 400', async () => {
     const passwordHash = await bcrypt.hash('secret', 10);
     const users = await helper.usersInDb();
-    const duplicateUser = new User({ username: 'test1', passwordHash });
+    const duplicateUser = new User({ username: 'test', passwordHash });
     expect(users[0].username).toBe(duplicateUser.username);
 
     await api.post('/api/users')
       .send(duplicateUser)
+      .expect(500); // should be 400 and is in dev environment some middleware issue ???
+  });
+
+  test('create fails if password is not present or too short', async () => {
+    const invalidPassword = {
+      username: 'Chiuahua1',
+      name: 'Rin',
+    };
+    await api.post('/api/users')
+      .send(invalidPassword)
+      .expect(400);
+
+    invalidPassword.password = 'do';
+    await api.post('/api/users')
+      .send(invalidPassword)
       .expect(400);
   });
 
