@@ -3,33 +3,60 @@ const supertest = require('supertest');
 const app = require('../app');
 
 const api = supertest(app);
+const User = require('../models/user');
 const Blog = require('../models/blog');
 const helper = require('./blog_test_helper');
 
 const initialBlogs = [helper.blogs[0], helper.blogs[1]];
+let token = null;
+beforeAll(async () => {
+  // creating a user
+  User.deleteMany({});
+  const testUser = {
+    username: 'Chiuahua1',
+    name: 'Rin',
+    password: 'dogpassword',
+  };
+  await api.post('/api/users')
+    .send(testUser)
+    .expect(201);
+  const login = await api.post('/api/login')
+    .send({
+      username: testUser.username,
+      password: testUser.password,
+    });
+  token = login.body.token;
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObj = new Blog(initialBlogs[0]);
-  await blogObj.save();
-  blogObj = new Blog(initialBlogs[1]);
-  await blogObj.save();
-}, 100000);
+  await api.post('/api/blogs')
+    .set('Authorization', token)
+    .send(initialBlogs[0]);
+  await api.post('/api/blogs')
+    .set('Authorization', token)
+    .send(initialBlogs[1]);
+});
 
 describe('when blogs present in db', () => {
   test('blogs are returned in json', async () => {
     await api.get('/api/blogs')
+      .set('Authorization', token)
       .expect(200)
       .expect('Content-Type', /application\/json/);
   });
 
   test('all blogs are returned', async () => {
-    const response = await api.get('/api/blogs');
+    const response = await api
+      .get('/api/blogs')
+      .set('Authorization', token);
     expect(response.body).toHaveLength(initialBlogs.length);
   });
 
   test('blogs identified by \'id\'', async () => {
-    const response = await api.get('/api/blogs');
+    const response = await api
+      .get('/api/blogs')
+      .set('Authorization', token);
     expect(response.body[0].id).toBeDefined();
   });
 });
@@ -44,6 +71,7 @@ describe('valid blogs can be added to the db', () => {
     };
     // testing for expected response
     await api.post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -59,8 +87,9 @@ describe('valid blogs can be added to the db', () => {
       author: 'Cartoon Foxes',
       url: 'https://why.com/',
     };
-    // expect blog to be added without likes defined
+    // expect blog to be added wi.set('Authorization', token)thout likes defined
     await api.post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201);
     // checking for likes: 0 in newly added blog
@@ -77,6 +106,7 @@ describe('invalid blogs cannot be saved', () => {
       likes: 7,
     };
     await api.post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(400);
   });
@@ -87,6 +117,7 @@ describe('invalid blogs cannot be saved', () => {
       likes: 7,
     };
     await api.post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(400);
   });
@@ -95,10 +126,10 @@ describe('invalid blogs cannot be saved', () => {
 describe('blogs can be deleted', () => {
   test('returns status 204 if valid', async () => {
     const blogsBefore = await helper.blogsInDb();
-    const blogToDelete = blogsBefore[0];
-
+    const blogToDelete = blogsBefore[1];
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', token)
       .expect(204);
 
     const remainingBlogs = await helper.blogsInDb();
@@ -120,6 +151,7 @@ describe('blogs can be edited', () => {
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
+      .set('Authorization', token)
       .send(amendedBlog)
       .expect(200);
 

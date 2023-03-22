@@ -1,9 +1,7 @@
 // controller for blogs
 
-const jwt = (require('jsonwebtoken'));
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
-const User = require('../models/user');
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
@@ -13,7 +11,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const blog = await new Blog(request.body);
-  const user = request.user;
+  const user = await request.user;
   blog.user = user.id;
 
   const newBlog = await blog.save();
@@ -38,7 +36,6 @@ blogsRouter.put('/:id', async (req, res) => {
 
 blogsRouter.delete('/:id', async (req, res) => {
   const user = await req.user;
-  console.log(user);
   const blog = await Blog.findById(req.params.id);
 
   if (user.id !== blog.user.toString()) {
