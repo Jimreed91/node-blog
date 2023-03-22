@@ -15,7 +15,6 @@ const unknownEndpoint = (request, response) => {
 
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('authorization');
-  console.log(authorization);
   if (authorization && authorization.startsWith('Bearer ')) {
     authorization.replace('Bearer ', '');
   }
@@ -23,7 +22,6 @@ const tokenExtractor = (request, response, next) => {
   if (!token.id) {
     response.status(401).json({ error: 'token invalid' });
   }
-  console.log(request.authorization);
   request.token = token;
   next();
 };

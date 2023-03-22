@@ -13,8 +13,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const blog = await new Blog(request.body);
-  // verifying auth
-  console.log(request)
+
   const user = await User.findById(request.token.id);
   blog.user = user.id;
 
@@ -39,6 +38,16 @@ blogsRouter.put('/:id', async (req, res) => {
 });
 
 blogsRouter.delete('/:id', async (req, res) => {
+  const user = await User.findById(req.token.id);
+  const blog = await Blog.findById(req.params.id);
+
+  if (user.id !== blog.user.toString()) {
+    return res.status(400).json(
+      {
+        error: 'users can only delete their own blogs',
+      },
+    );
+  };
   await Blog.findByIdAndRemove(req.params.id);
   res.status(204).end();
 });
