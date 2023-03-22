@@ -121,6 +121,16 @@ describe('invalid blogs cannot be saved', () => {
       .send(newBlog)
       .expect(400);
   });
+  test('if auth header is missing, returns 401 unauthorized', async () => {
+    const newBlog = {
+      author: 'Cartoon Foxes',
+      url: 'https://why.com/',
+      likes: 7,
+    };
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(401);
+  });
 });
 
 describe('blogs can be deleted', () => {

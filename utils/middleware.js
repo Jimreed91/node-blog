@@ -16,6 +16,9 @@ const unknownEndpoint = (request, response) => {
 
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('authorization');
+  if (!authorization) {
+    response.status(401).json({ error: 'no auth token in headers' })
+  }
   if (authorization && authorization.startsWith('Bearer ')) {
     authorization.replace('Bearer ', '');
   }
