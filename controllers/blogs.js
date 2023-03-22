@@ -13,8 +13,7 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const blog = await new Blog(request.body);
-
-  const user = await User.findById(request.token.id);
+  const user = request.user;
   blog.user = user.id;
 
   const newBlog = await blog.save();
@@ -38,7 +37,8 @@ blogsRouter.put('/:id', async (req, res) => {
 });
 
 blogsRouter.delete('/:id', async (req, res) => {
-  const user = await User.findById(req.token.id);
+  const user = await req.user;
+  console.log(user);
   const blog = await Blog.findById(req.params.id);
 
   if (user.id !== blog.user.toString()) {
