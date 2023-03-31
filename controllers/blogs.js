@@ -10,7 +10,7 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-blogsRouter.post('/', userExtractor, tokenExtractor, async (request, response) => {
+blogsRouter.post('/', tokenExtractor, userExtractor, async (request, response) => {
   const blog = await new Blog(request.body);
   const user = await request.user;
   blog.user = user.id;
@@ -22,7 +22,7 @@ blogsRouter.post('/', userExtractor, tokenExtractor, async (request, response) =
   response.status(201).json(newBlog);
 });
 
-blogsRouter.put('/:id', userExtractor, tokenExtractor, async (req, res) => {
+blogsRouter.put('/:id', tokenExtractor, userExtractor, async (req, res) => {
   const { body } = req;
   const blog = {
     title: body.title,
@@ -35,7 +35,7 @@ blogsRouter.put('/:id', userExtractor, tokenExtractor, async (req, res) => {
   res.status(200).json(blog);
 });
 
-blogsRouter.delete('/:id', userExtractor, tokenExtractor, async (req, res) => {
+blogsRouter.delete('/:id', tokenExtractor, userExtractor, async (req, res) => {
   const user = await req.user;
   const blog = await Blog.findById(req.params.id);
 

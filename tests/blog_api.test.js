@@ -25,6 +25,7 @@ beforeAll(async () => {
       username: testUser.username,
       password: testUser.password,
     });
+
   token = login.body.token;
 });
 
